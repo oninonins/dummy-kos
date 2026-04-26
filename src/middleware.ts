@@ -6,25 +6,17 @@ export default auth((req) => {
   const isLoggedIn = !!req.auth;
   const isAdmin = req.auth?.user?.role === "ADMIN";
 
-  const isApiAuthRoute = nextUrl.pathname.startsWith("/api/auth");
-  const isAdminRoute = nextUrl.pathname.startsWith("/admin");
-
-  if (isApiAuthRoute) {
-    return NextResponse.next();
+  if (!isLoggedIn) {
+    return NextResponse.redirect(new URL("/login", nextUrl));
   }
-
-  if (isAdminRoute) {
-    if (!isLoggedIn) {
-      return NextResponse.redirect(new URL("/login", nextUrl));
-    }
-    if (!isAdmin) {
-      return NextResponse.redirect(new URL("/", nextUrl));
-    }
+  
+  if (!isAdmin) {
+    return NextResponse.redirect(new URL("/", nextUrl));
   }
 
   return NextResponse.next();
 });
 
 export const config = {
-  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+  matcher: ["/admin/:path*"],
 };
