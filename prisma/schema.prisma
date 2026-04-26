@@ -1,0 +1,156 @@
+// =============================================================================
+// schema.prisma — Dummy Kos Reservation System
+// =============================================================================
+// Architecture decisions:
+//   • Property  → a physical boarding house building (owned by a User[OWNER])
+//   • Room      → a specific, bookable unit inside a Property
+//   • Reservation → a booking record tying a User[TENANT] to a Room
+//   • All monetary values are stored in IDR (integer, no decimals)
+//   • Midtrans fields live on Reservation — not on Room — so a room can be
+//     re-booked cleanly after a failed/expired payment
+// =============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// =============================================================================
+// ENUMS
+// =============================================================================
+
+enum UserRole {
+  TENANT // person looking for a room
+  OWNER  // landlord who lists properties
+}
+
+enum RoomStatus {
+  AVAILABLE // nobody has reserved it
+  ON_HOLD   // a PENDING reservation exists; 30-min countdown active
+  BOOKED    // payment confirmed; room is occupied
+}
+
+enum ReservationStatus {
+  PENDING   // created, waiting for payment
+  CONFIRMED // payment received; reservation active
+  EXPIRED   // hold timer ran out or payment was not completed
+  CANCELLED // manually cancelled by tenant or owner
+}
+
+/// Maps directly to Midtrans transaction_status values.
+/// Keep these in sync with the webhook handler logic.
+enum PaymentStatus {
+  UNPAID  // initial state before any payment attempt
+  PENDING // Midtrans received the transaction but not yet paid
+  PAID    // settlement / capture confirmed
+  EXPIRED // Midtrans expire / deny / cancel
+  REFUNDED
+}
+
+// =============================================================================
+// MODELS
+// =============================================================================
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  phone     String?
+  role      UserRole @default(TENANT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  properties   Property[]    @relation("OwnerProperties")
+  reservations Reservation[]
+
+  @@map("users")
+}
+
+model Property {
+  id        String   @id @default(cuid())
+  name      String
+  address   String
+  city      String
+  imageUrl  String?  // URL to hero image (Cloudinary / S3)
+  ownerId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  owner User   @relation("OwnerProperties", fields: [ownerId], references: [id], onDelete: Cascade)
+  rooms Room[]
+
+  @@index([city])    // fast city-level search
+  @@index([ownerId]) // fast owner dashboard queries
+  @@map("properties")
+}
+
+/// A Room is one bookable unit inside a Property.
+/// price       = monthly rent in IDR (e.g. 1_500_000)
+/// depositAmount = the upfront hold deposit charged at booking time
+/// type        = descriptive label (e.g. "Standar", "Deluxe", "Premium")
+model Room {
+  id            String     @id @default(cuid())
+  roomNumber    String     // e.g. "101", "A1"
+  type          String     @default("Standar")
+  description   String?
+  price         Int        // monthly rent in IDR
+  depositAmount Int        // hold deposit in IDR (always ≤ price)
+  status        RoomStatus @default(AVAILABLE)
+  propertyId    String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  // Relations
+  property     Property      @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  reservations Reservation[]
+
+  // A room number must be unique within a property
+  @@unique([propertyId, roomNumber])
+  @@index([status])     // hot query: "give me all AVAILABLE rooms"
+  @@index([propertyId])
+  @@map("rooms")
+}
+
+/// Reservation is the central record of a booking lifecycle.
+///
+/// State machine:
+///   PENDING (paymentStatus=UNPAID) →
+///   ON_HOLD room locked →
+///   PENDING (paymentStatus=PENDING, after Snap opened) →
+///   CONFIRMED (paymentStatus=PAID) OR EXPIRED (paymentStatus=EXPIRED)
+///
+/// Midtrans fields:
+///   midtransOrderId   — our unique order ID sent to Midtrans
+///   midtransSnapToken — returned by Snap API, used by frontend
+model Reservation {
+  id                String            @id @default(cuid())
+  userId            String
+  roomId            String
+  amount            Int               // deposit amount actually charged in IDR
+  holdExpiry        DateTime          // when ON_HOLD status expires (now + 30 min)
+  reservationStatus ReservationStatus @default(PENDING)
+  paymentStatus     PaymentStatus     @default(UNPAID)
+
+  // Midtrans integration fields
+  midtransOrderId   String  @unique  // e.g. "HOLD-abc123-1714123456789"
+  midtransSnapToken String?          // populated after Snap API call succeeds
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  // Performance indexes
+  @@index([midtransOrderId]) // webhook lookup — hits on every payment event
+  @@index([roomId])          // check active reservations for a room
+  @@index([userId])          // tenant reservation history
+  @@index([paymentStatus])   // cron job: find all PENDING to expire
+  @@map("reservations")
+}
