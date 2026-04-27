@@ -3,9 +3,7 @@
 import { useState } from "react";
 import { CreditCard, CheckCircle2, Clock, XCircle, Loader2, ShieldCheck } from "lucide-react";
 
-// ============================================================
-// BookingButton — Cheerful, student-friendly booking UI
-// Handles the full booking flow:
+// Komponen BookingButton
 // 1. Calls POST /api/booking to get a Snap token
 // 2. Opens Midtrans Snap popup for payment
 // ============================================================
@@ -218,7 +216,7 @@ export default function BookingButton({
         <div>
           <p className="text-xs font-700 text-[#16a34a]">Pembayaran Aman</p>
           <p className="text-[10px] text-[#6B7280]">
-            Diproses via <strong>Midtrans</strong> · QRIS, GoPay, OVO, Transfer
+            Diproses dengan QRIS, GoPay, OVO, Transfer
             Bank
           </p>
         </div>

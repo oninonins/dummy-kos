@@ -3,9 +3,7 @@
 import { useState } from "react";
 import { Search, MapPin, Sparkles, ShieldCheck } from "lucide-react";
 
-// ============================================================
-// HeroSection — Welcoming, cheerful, Gen-Z vibes
-// ============================================================
+// Komponen HeroSection untuk landing page.
 
 const POPULAR_SEARCHES = ["Depok", "Jogja", "Bandung", "Surabaya", "Malang"];
 
@@ -61,7 +59,7 @@ export default function HeroSection() {
 
       <div className="relative z-10 mx-auto max-w-7xl px-5 pt-28 pb-20 w-full">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left column — Copy & Search */}
+          {/* Left column, Copy & Search */}
           <div>
             {/* Label pill */}
             <div className="flex items-center gap-2 mb-5">
@@ -110,7 +108,7 @@ export default function HeroSection() {
             {/* Subheadline */}
             <p className="text-lg text-[#6B7280] leading-relaxed mb-8 max-w-lg">
               Cari kos, lihat foto, cek harga, dan pesan kamar dalam hitungan
-              menit. Pembayaran 100% aman terverifikasi otomatis —
+              menit. Pembayaran 100% aman terverifikasi otomatis,
               kamarmu langsung dikunci! 🔒
             </p>
 
@@ -178,7 +176,7 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* Right column — floating card visuals */}
+          {/* Right column, floating card visuals */}
           <div className="hidden lg:block relative">
             <HeroVisualCards />
           </div>
@@ -221,7 +219,7 @@ function HeroVisualCards() {
         </div>
       </div>
 
-      {/* Floating mini card — top right */}
+      {/* Floating mini card di kanan atas */}
       <div
         className="absolute top-4 right-4 bg-white rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] p-4"
         style={{ minWidth: 180 }}
@@ -242,7 +240,7 @@ function HeroVisualCards() {
         </p>
       </div>
 
-      {/* Floating mini card — bottom left */}
+      {/* Floating mini card di kiri bawah */}
       <div
         className="absolute bottom-8 left-0 bg-white rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] p-4"
         style={{ minWidth: 200 }}
@@ -285,7 +283,7 @@ function HeroVisualCards() {
         <p className="text-[11px] text-[#374151] font-600">
           &ldquo;Tempatnya bersih banget, worth it!&rdquo;
         </p>
-        <p className="text-[10px] text-[#9CA3AF] mt-1">— Rina, Mahasiswa UI</p>
+        <p className="text-[10px] text-[#9CA3AF] mt-1"> Rina, Mahasiswa UI</p>
       </div>
     </div>
   );

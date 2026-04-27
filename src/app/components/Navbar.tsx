@@ -3,9 +3,7 @@
 import { useState, useEffect } from "react";
 import { Home, Search, Heart, Bell, Menu, X } from "lucide-react";
 
-// ============================================================
-// Navbar — Sticky, transparent-to-frosted on scroll
-// ============================================================
+// Komponen Navbar utama
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);

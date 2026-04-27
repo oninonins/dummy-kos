@@ -4,17 +4,17 @@ import { createSnapTransaction } from "@/lib/midtrans";
 import { RoomStatus, PaymentStatus, ReservationStatus } from "@prisma/client";
 
 // =============================================================================
-// POST /api/booking — Initiate a Reservation Hold
+// POST /api/booking, Initiate a Reservation Hold
 // =============================================================================
 //
 // End-to-end flow handled by this route:
 //
 //   [1] Parse & validate request body  (roomId, userId)
 //   [2] Open a Prisma DB transaction
-//       [2a] SELECT room — verify it exists
+//       [2a] SELECT room: verify it exists
 //       [2b] Optimistic-lock UPDATE: room WHERE status=AVAILABLE → ON_HOLD
 //            If count=0, another request won the race → 409 Conflict
-//       [2c] SELECT user — get name/email for Midtrans customer_details
+//       [2c] SELECT user: get name/email for Midtrans customer_details
 //       [2d] INSERT reservation (PENDING/UNPAID) with 30-min holdExpiry
 //       [2e] Call Midtrans Snap API → get snapToken
 //       [2f] UPDATE reservation with the snapToken
@@ -23,7 +23,7 @@ import { RoomStatus, PaymentStatus, ReservationStatus } from "@prisma/client";
 // Security principles applied:
 //   • Amount is NEVER read from the request body (server-authoritative pricing)
 //   • Optimistic locking prevents double-booking without SELECT FOR UPDATE
-//   • All DB writes are atomic — if Midtrans call fails, the transaction rolls back
+//   • All DB writes are atomic: if Midtrans call fails, the transaction rolls back
 //
 // =============================================================================
 
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
 
     // -------------------------------------------------------------------------
     // [1] INPUT VALIDATION
-    // Simple presence check — in production, use Zod schema validation
+    // Simple presence check, in production, use Zod schema validation
     // -------------------------------------------------------------------------
     if (!roomId || typeof roomId !== "string") {
       return NextResponse.json(
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     }
 
     // -------------------------------------------------------------------------
-    // [2] PRISMA TRANSACTION — Atomic booking + Snap token
+    // [2] PRISMA TRANSACTION: Atomic booking + Snap token
     //
     // Why a transaction?
     //   If the Midtrans API call throws (network error, bad key, etc.),
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
       });
 
       if (lockResult.count === 0) {
-        // Either already ON_HOLD or BOOKED — both are "not available" to us
+        // Either already ON_HOLD or BOOKED, both are "not available" to us
         throw new Error("ROOM_NOT_AVAILABLE");
       }
 
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
 
       // [2e] Request Snap token from Midtrans
       //   If this throws (e.g. invalid server key, Midtrans outage),
-      //   the entire transaction rolls back — no orphaned ON_HOLD room.
+      //   the entire transaction rolls back, no orphaned ON_HOLD room.
       const snapResponse = await createSnapTransaction({
         orderId,
         grossAmount: amount,
@@ -171,7 +171,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: mapped.message }, { status: mapped.status });
     }
 
-    // Unexpected error — log full details server-side, return generic response
+    // Unexpected error, log full details server-side, return generic response
     console.error("[POST /api/booking] Unexpected error:", error);
     return NextResponse.json(
       { error: "Terjadi kesalahan pada server. Silakan coba lagi." },

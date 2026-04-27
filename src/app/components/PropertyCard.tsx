@@ -1,11 +1,9 @@
 "use client";
 
 import { Star, MapPin, Wifi, AirVent, ShowerHead, ChevronRight } from "lucide-react";
-import { RoomStatus } from "@prisma/client";
+type RoomStatusType = "AVAILABLE" | "ON_HOLD" | "BOOKED";
 
-// ============================================================
-// PropertyCard — Visual-first, image 70%, Gen-Z friendly
-// ============================================================
+// Komponen PropertyCard untuk menampilkan daftar kos.
 
 interface PropertyCardProps {
   room: {
@@ -14,7 +12,7 @@ interface PropertyCardProps {
     description: string | null;
     price: number;
     depositAmount: number;
-    status: RoomStatus;
+    status: RoomStatusType;
     property: {
       id: string;
       name: string;
@@ -55,8 +53,8 @@ function formatRupiah(amount: number) {
   }).format(amount);
 }
 
-function StatusBadge({ status }: { status: RoomStatus }) {
-  if (status === RoomStatus.AVAILABLE) {
+function StatusBadge({ status }: { status: RoomStatusType }) {
+  if (status === "AVAILABLE") {
     return (
       <span className="badge status-available">
         <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#16a34a]" />
@@ -64,7 +62,7 @@ function StatusBadge({ status }: { status: RoomStatus }) {
       </span>
     );
   }
-  if (status === RoomStatus.ON_HOLD) {
+  if (status === "ON_HOLD") {
     return (
       <span className="badge status-hold">
         🔒 Di-hold
@@ -82,7 +80,7 @@ export default function PropertyCard({ room, index = 0 }: PropertyCardProps) {
   const gradient = CARD_GRADIENTS[index % CARD_GRADIENTS.length];
   const AmenityIcons = AMENITY_SETS[index % AMENITY_SETS.length];
   const rating = RATINGS[index % RATINGS.length];
-  const isAvailable = room.status === RoomStatus.AVAILABLE;
+  const isAvailable = room.status === "AVAILABLE";
 
   return (
     <article
@@ -114,7 +112,7 @@ export default function PropertyCard({ room, index = 0 }: PropertyCardProps) {
         {/* Dark gradient overlay for text readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
 
-        {/* Rating badge — top left */}
+        {/* Rating badge di kiri atas */}
         <div className="absolute top-3 left-3">
           <span
             className="badge"
@@ -129,12 +127,12 @@ export default function PropertyCard({ room, index = 0 }: PropertyCardProps) {
           </span>
         </div>
 
-        {/* Status badge — top right */}
+        {/* Status badge di kanan atas */}
         <div className="absolute top-3 right-3">
           <StatusBadge status={room.status} />
         </div>
 
-        {/* Amenity icons — bottom left */}
+        {/* Ikon fasilitas di kiri bawah */}
         <div className="absolute bottom-3 left-3 flex gap-1.5">
           {AmenityIcons.map((Icon, i) => (
             <span
@@ -156,7 +154,7 @@ export default function PropertyCard({ room, index = 0 }: PropertyCardProps) {
         {/* Property name & location */}
         <div className="mb-3">
           <h3 className="text-[15px] font-800 text-[#1F2937] truncate">
-            {room.property.name} — Kamar {room.roomNumber}
+            {room.property.name}, Kamar {room.roomNumber}
           </h3>
           <p className="flex items-center gap-1 text-xs font-600 text-[#9CA3AF] mt-0.5">
             <MapPin size={11} className="text-[#FF6B6B] shrink-0" />
@@ -196,7 +194,7 @@ export default function PropertyCard({ room, index = 0 }: PropertyCardProps) {
           </a>
         ) : (
           <div className="w-full flex items-center justify-center gap-2 rounded-full border-2 border-[#E5E7EB] py-3 text-sm font-700 text-[#9CA3AF] cursor-not-allowed">
-            {room.status === RoomStatus.ON_HOLD ? "🔒 Sedang di-hold" : "✅ Kamar Penuh"}
+            {room.status === "ON_HOLD" ? "🔒 Sedang di-hold" : "✅ Kamar Penuh"}
           </div>
         )}
 

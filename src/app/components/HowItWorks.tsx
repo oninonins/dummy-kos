@@ -1,14 +1,4 @@
 // ============================================================
-// HowItWorks — Simple 4-step explainer for students
-//
-// ✅ Server Component — no "use client" needed here.
-// This component has:
-//   • No useState / useEffect / useRef hooks
-//   • No event handlers (onClick, onChange, etc.)
-//   • No browser-only APIs
-//
-// Keeping it as a Server Component means its JavaScript is
-// NEVER sent to the client bundle → smaller JS payload → faster page.
 //
 // The CSS-only hover effect (group-hover:-translate-y-1, group-hover:scale-110)
 // is handled entirely by Tailwind + CSS, not JavaScript.

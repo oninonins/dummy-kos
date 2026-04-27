@@ -10,8 +10,8 @@ import Footer from "@/app/components/Footer";
 import { MapPin, SlidersHorizontal, TrendingUp, ShieldCheck } from "lucide-react";
 
 // ============================================================
-// Home Page — Gen-Z friendly kos reservation platform
-// Server Component: fetches rooms from DB, renders the UI
+// Halaman Utama
+// Server Component: mengambil data kamar dari DB dan me-render UI
 // ============================================================
 
 // Mock user ID for demo purposes
@@ -39,13 +39,13 @@ export default async function HomePage() {
         strategy="afterInteractive"
       />
 
-      {/* ── Navigation ── */}
+      {/* Navigasi */}
       <Navbar />
 
-      {/* ── Hero ── */}
+      {/* Hero */}
       <HeroSection />
 
-      {/* ── Popular Kos Section ── */}
+      {/* Bagian Kosan Populer */}
       <section id="popular" className="py-20 px-5" style={{ background: "#FAFAFA" }}>
         <div className="mx-auto max-w-7xl">
           {/* Section header */}
@@ -160,7 +160,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Booking Section (per available room) ── */}
+      {/* Bagian Booking */}
       {rooms.some((r) => r.status === RoomStatus.AVAILABLE) && (
         <section
           className="py-20 px-5"
@@ -186,7 +186,7 @@ export default async function HomePage() {
                 🎯
               </h2>
               <p className="mt-2 text-[#6B7280] text-sm max-w-md mx-auto">
-                Bayar deposit via Midtrans dan kamarmu langsung dikunci 30
+                Bayar deposit dan kamarmu langsung dikunci 30
                 menit. Aman & terpercaya!
               </p>
               {/* Midtrans global badge */}
@@ -199,7 +199,7 @@ export default async function HomePage() {
               >
                 <ShieldCheck size={15} className="text-[#16a34a]" />
                 <span className="text-xs font-700 text-[#16a34a]">
-                  Semua pembayaran diproses aman via Midtrans
+                  Semua pembayaran diproses aman
                 </span>
               </div>
             </div>
@@ -230,17 +230,17 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ── How It Works ── */}
+      {/* Cara Kerja */}
       <HowItWorks />
 
-      {/* ── Footer ── */}
+      {/* Footer */}
       <Footer />
     </>
   );
 }
 
 // ============================================================
-// Data fetching
+// Mengambil Data
 // ============================================================
 
 async function fetchRooms() {

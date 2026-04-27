@@ -1,20 +1,20 @@
 import crypto from "crypto";
 
 // =============================================================================
-// lib/midtrans.ts — Midtrans Snap Client & Helpers
+// lib/midtrans.ts, Midtrans Snap Client & Helpers
 // =============================================================================
 //
 // This module is the single integration point for Midtrans in our app.
 // Responsibilities:
 //   1. Snap client initialisation (server-side only)
-//   2. createSnapTransaction() — creates a payment session
-//   3. verifySignature()       — validates webhook authenticity
+//   2. createSnapTransaction(): creates a payment session
+//   3. verifySignature(): validates webhook authenticity
 //
 // Environment variables required (see .env.example):
-//   MIDTRANS_SERVER_KEY       — starts with "SB-Mid-server-..." (sandbox)
-//   MIDTRANS_CLIENT_KEY       — starts with "SB-Mid-client-..." (sandbox)
-//   MIDTRANS_IS_PRODUCTION    — "true" | "false"
-//   NEXT_PUBLIC_MIDTRANS_CLIENT_KEY — same as CLIENT_KEY, exposed to browser
+//   MIDTRANS_SERVER_KEY: starts with "SB-Mid-server-..." (sandbox)
+//   MIDTRANS_CLIENT_KEY: starts with "SB-Mid-client-..." (sandbox)
+//   MIDTRANS_IS_PRODUCTION: "true" | "false"
+//   NEXT_PUBLIC_MIDTRANS_CLIENT_KEY: same as CLIENT_KEY, exposed to browser
 //
 // =============================================================================
 
@@ -23,7 +23,7 @@ const midtransClient = require("midtrans-client");
 
 const isProduction = process.env.MIDTRANS_IS_PRODUCTION === "true";
 
-// Initialise once — this is safe because this file is only imported server-side
+// Diinisialisasi sekali, aman karena hanya dipanggil di server.
 // (API routes / Server Actions / Server Components).
 export const snap = new midtransClient.Snap({
   isProduction,
@@ -54,8 +54,8 @@ export interface SnapTransactionResult {
 // =============================================================================
 //
 // Calls the Midtrans Snap API and returns:
-//   { token }        — used by window.snap.pay() on the client
-//   { redirect_url } — fallback if Snap popup doesn't load
+//   { token }: used by window.snap.pay() on the client
+//   { redirect_url }: fallback if Snap popup doesn't load
 //
 // Midtrans will:
 //   - Validate the order_id is unique (throws if reused)
@@ -94,7 +94,7 @@ export async function createSnapTransaction(
         name: itemName,
       },
     ],
-    // Token expires in 30 minutes — matching our holdExpiry duration.
+    // Token expires in 30 minutes, matching our holdExpiry duration.
     // After expiry, Midtrans sends a webhook with transaction_status=expire.
     expiry: {
       unit: "minutes",

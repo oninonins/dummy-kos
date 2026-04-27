@@ -1,7 +1,7 @@
 "use client";
 
 // ============================================================
-// Footer.tsx — "use client" is REQUIRED here because:
+// Footer.tsx, "use client" dibutuhkan karena:
 //   1. onMouseEnter / onMouseLeave are DOM event handlers
 //   2. new Date().getFullYear() can cause a hydration mismatch
 //      (server renders at one second, client rehydrates at another).
@@ -17,7 +17,7 @@
 import { useState, useEffect } from "react";
 import { Home, Globe, MessageCircle, Mail, ShieldCheck, Heart } from "lucide-react";
 
-// Social link data — defined outside the component so it's not recreated on
+// Data link sosial
 // every render. The `color` will be applied via inline style on hover.
 const SOCIAL_LINKS = [
   { Icon: Globe,         label: "Website",   color: "#6366F1" },
@@ -36,7 +36,7 @@ const NAV_LINKS = [
 export default function Footer() {
   // ── Hydration-safe year ──────────────────────────────────────────────────
   // Problem: If we write `new Date().getFullYear()` directly in JSX, the
-  // server renders "2026" and the client rehydrates "2026" too — usually fine.
+  // server me-render "2026" dan klien juga me-rehydrate "2026", biasanya aman.
   // BUT at exactly midnight on Jan 1st, the server might render "2025" while
   // the client renders "2026", causing React to throw a hydration warning.
   //
@@ -68,7 +68,7 @@ export default function Footer() {
             </div>
             <p className="text-sm text-[#6B7280] leading-relaxed max-w-xs">
               Platform reservasi kos paling santai buat mahasiswa &amp; pelajar.
-              Cari, pesan, dan check-in — semua dari HP! 📱
+              Cari, pesan, dan check-in, semua dari HP! 📱
             </p>
 
             {/* Midtrans safety badge */}
@@ -108,7 +108,7 @@ export default function Footer() {
               Ikuti Kami
             </h4>
 
-            {/* Social icon buttons — need onMouseEnter/Leave → must be client */}
+            {/* Tombol ikon sosial */}
             <div className="flex gap-3 mb-5">
               {SOCIAL_LINKS.map(({ Icon, label, color }) => (
                 <SocialIconButton
@@ -148,7 +148,7 @@ export default function Footer() {
               then swap in the real year after hydration. This prevents both a
               hydration mismatch AND a layout shift.
             */}
-            © {year ?? "\u00A0\u00A0\u00A0\u00A0"} KosSolution — Dibuat dengan{" "}
+            © {year ?? "\u00A0\u00A0\u00A0\u00A0"} KosSolution, Dibuat dengan{" "}
             <Heart
               size={10}
               className="inline text-[#FF6B6B] fill-[#FF6B6B]"
@@ -165,14 +165,12 @@ export default function Footer() {
 }
 
 // ── SocialIconButton ─────────────────────────────────────────────────────────
-// Extracted into its own mini-component for clarity. The hover color-swap is
-// done via React state rather than inline imperative DOM manipulation, which
-// is the idiomatic React pattern.
+// SocialIconButton
+// Uses React state for hover effects to handle dynamic colors.
 //
-// Why not use pure CSS `:hover`?
-// Because the border color is a *dynamic* value (`color` prop). We can't write
-// a static Tailwind class for an arbitrary hex value — it won't be in the
-// purge-safe class list. So we use JS state to toggle inline styles.
+// Why not use pure CSS :hover?
+// Because the border color is a dynamic value. We cannot write
+// static Tailwind classes for arbitrary hex values. So we use JS state to toggle inline styles.
 
 interface SocialIconButtonProps {
   Icon: React.ElementType;

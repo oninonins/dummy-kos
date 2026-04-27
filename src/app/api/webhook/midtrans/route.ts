@@ -4,17 +4,17 @@ import { verifySignature } from "@/lib/midtrans";
 import { PaymentStatus, ReservationStatus, RoomStatus } from "@prisma/client";
 
 // =============================================================================
-// POST /api/webhook/midtrans — Midtrans Payment Notification Handler
+// POST /api/webhook/midtrans, Midtrans Payment Notification Handler
 // =============================================================================
 //
 // Midtrans calls this URL asynchronously whenever a payment event occurs.
-// It does NOT depend on the user's browser — it works even if the user closed
+// It does NOT depend on the user's browser; it works even if the user closed
 // their tab immediately after paying.
 //
 // Security layers:
-//   [S1] SHA512 Signature validation — proves the request came from Midtrans
-//   [S2] Idempotency guard — prevents duplicate DB updates on retried webhooks
-//   [S3] Atomic DB transaction — reservation + room updated together
+//   [S1] SHA512 Signature validation: proves the request came from Midtrans
+//   [S2] Idempotency guard: prevents duplicate DB updates on retried webhooks
+//   [S3] Atomic DB transaction: reservation + room updated together
 //
 // Midtrans transaction_status values we care about:
 //   "capture"    → credit card capture (check fraud_status)
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     // [S1] SIGNATURE VALIDATION
     // Formula (per Midtrans docs):
     //   SHA512( order_id + status_code + gross_amount + SERVER_KEY )
-    // If this fails, the request is not from Midtrans — reject it immediately.
+    // If this fails, the request is not from Midtrans, reject it immediately.
     // -------------------------------------------------------------------------
     const isValid = verifySignature(orderId, statusCode, grossAmount, signatureKey);
     if (!isValid) {
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
       // -----------------------------------------------------------------------
       if (transactionStatus === "capture" && fraudStatus !== "accept") {
         console.warn(`[Webhook] Fraud detected [fraud_status=${fraudStatus}] for order: ${orderId}`);
-        // Don't BOOKED the room — wait for a "settlement" or let it expire
+        // Don't BOOKED the room, wait for a "settlement" or let it expire
         await prisma.reservation.update({
           where: { id: reservation.id },
           data: { paymentStatus: PaymentStatus.EXPIRED },
@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
 
     } else if (transactionStatus === "pending") {
       // -----------------------------------------------------------------------
-      // PENDING PATH — e-wallet or bank transfer initiated, not yet settled
+      // PENDING PATH, e-wallet or bank transfer initiated, not yet settled
       // Room stays ON_HOLD. Reservation paymentStatus → PENDING.
       // -----------------------------------------------------------------------
       await prisma.reservation.update({
@@ -148,7 +148,7 @@ export async function POST(request: NextRequest) {
       transactionStatus === "deny"
     ) {
       // -----------------------------------------------------------------------
-      // FAILURE PATH — Hold expired / payment denied / cancelled
+      // FAILURE PATH, Hold expired / payment denied / cancelled
       // Release the room back to AVAILABLE so other users can book it.
       // -----------------------------------------------------------------------
       await prisma.$transaction(async (tx) => {
@@ -172,7 +172,7 @@ export async function POST(request: NextRequest) {
 
       console.log(`[Webhook] ❌ EXPIRED/CANCELLED [${transactionStatus}] for order: ${orderId}`);
     } else {
-      // Unknown status — log it for investigation, return 200 to stop retries
+      // Unknown status, log it for investigation, return 200 to stop retries
       console.warn(`[Webhook] Unknown transaction_status [${transactionStatus}] for order: ${orderId}`);
     }
 
