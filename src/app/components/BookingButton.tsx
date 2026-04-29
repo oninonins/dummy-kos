@@ -72,8 +72,8 @@ const STATUS_CONFIG: Record<
     bg: "#fff5f5",
     border: "#fecaca",
     text: "#dc2626",
-    emoji: "😢",
-    label: "Waduh, ada yang salah nih.",
+    emoji: "",
+    label: "",
   },
   closed: {
     bg: "#f9fafb",

@@ -109,9 +109,8 @@ export default async function HomePage() {
                 border: "2px dashed #FECACA",
               }}
             >
-              <p className="text-4xl mb-4">😅</p>
+              <p className="text-4xl mb-4"></p>
               <p className="text-lg font-800 text-[#FF6B6B] mb-2">
-                Waduh, database-nya belum nyala nih!
               </p>
               <p className="text-sm text-[#6B7280] mb-4">
                 {error}
@@ -120,9 +119,7 @@ export default async function HomePage() {
                 className="block text-xs p-4 rounded-2xl text-left max-w-sm mx-auto font-mono text-[#374151]"
                 style={{ background: "#F9FAFB", border: "1px solid #E5E7EB" }}
               >
-                docker-compose up -d<br />
-                npx prisma db push<br />
-                npx prisma db seed
+             
               </code>
             </div>
           ) : rooms.length === 0 ? (
