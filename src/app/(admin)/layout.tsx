@@ -1,4 +1,5 @@
 import { auth, signOut } from "@/auth";
+import { Analytics } from "@vercel/analytics/next";
 import { Home, Building, LogOut } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
